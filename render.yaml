@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: trading-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: ./start_web.sh
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
