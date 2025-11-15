@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import uuid
 import os
-import json          # <— add this line
+import json
 from datetime import datetime
 
 app = Flask(__name__)
@@ -34,6 +34,53 @@ def record(action, amount):
 # left side: what you choose in the app
 # 'yahoo': ticker used for data
 # 'plus500': how you’d trade it on Plus500
+def run_bot_scan_once():
+    """Run one full scan over MARKETS and save to signals.json."""
+    results = []
+
+    for key, info in MARKETS.items():
+        yahoo = info.get("yahoo")
+        if not yahoo:
+            continue
+
+        try:
+            df = yf.download(yahoo, period="3mo", interval="1h", progress=False)
+        except Exception as e:
+            print(f"Error downloading {yahoo}: {e}")
+            continue
+
+        if df is None or df.empty or len(df) < 60:
+            print(f"No data for {yahoo}, skipping.")
+            continue
+
+        df["SMA20"] = df["Close"].rolling(20).mean()
+        df["SMA50"] = df["Close"].rolling(50).mean()
+        df = df.dropna()
+
+        short_now = float(df["SMA20"].iloc[-1])
+        long_now = float(df["SMA50"].iloc[-1])
+        short_prev = float(df["SMA20"].iloc[-2])
+        long_prev = float(df["SMA50"].iloc[-2])
+        price_now = float(df["Close"].iloc[-1])
+
+        signal = "none"
+        if short_now > long_now and short_prev <= long_prev:
+            signal = "BUY"
+        elif short_now < long_now and short_prev >= long_prev:
+            signal = "SELL"
+
+        results.append({
+            "symbol": key,
+            "signal": signal,
+            "price": price_now,
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M")
+        })
+
+    try:
+        with open("signals.json", "w") as f:
+            json.dump(results, f)
+    except Exception as e:
+        print(f"Error writing signals.json: {e}")
 
 MARKETS = {
     "NAS100": {
@@ -251,9 +298,19 @@ def live_signals():
 
     return render_template("live_signals.html", signals=enriched, error=error)
 
+@app.route("/refresh-live-signals")
+def refresh_live_signals():
+    try:
+        run_bot_scan_once()
+    except Exception as e:
+        print(f"Manual refresh error: {e}")
+    # After scanning, go back to the live signals page
+    return redirect(url_for("live_signals"))
+
 
 if __name__ == "__main__":
     app.run()
+
 
 
 
