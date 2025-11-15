@@ -8,11 +8,23 @@ WATCHLIST = {
     "SPX500": "^GSPC",
     "UK100": "^FTSE",
     "GER40": "^GDAXI",
+
+    # Commodities
     "GOLD": "GC=F",
-    "OIL": "CL=F",
+    "SILVER": "SI=F",
+    "COPPER": "HG=F",
+    "NATGAS": "NG=F",
+    "PLATINUM": "PL=F",
+    "PALLADIUM": "PA=F",
+    "OILW": "CL=F",
+    "OILB": "BZ=F",
+
+    # Forex
     "EURUSD": "EURUSD=X",
     "GBPUSD": "GBPUSD=X",
     "USDJPY": "JPY=X",
+
+    # Stocks
     "AAPL": "AAPL",
     "TSLA": "TSLA",
     "MSFT": "MSFT",
@@ -20,7 +32,11 @@ WATCHLIST = {
     "META": "META",
     "NVDA": "NVDA",
     "GOOGL": "GOOGL",
-    "NFLX": "NFLX"
+    "NFLX": "NFLX",
+
+    # Crypto
+    "BTCUSD": "BTC-USD",
+    "ETHUSD": "ETH-USD"
 }
 
 
