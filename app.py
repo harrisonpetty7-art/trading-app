@@ -10,6 +10,10 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+# --------------------------
+# Simple in-memory account
+# --------------------------
+
 ACCOUNT = {
     "balance": 100000.0,
     "history": []
@@ -22,6 +26,55 @@ def record(action, amount):
         "amount": amount,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
     })
+
+# --------------------------
+# Markets for Signals (Plus500-friendly)
+# --------------------------
+# left side: what you choose in the app
+# 'yahoo': ticker used for data
+# 'plus500': how you’d trade it on Plus500
+
+MARKETS = {
+    "NAS100": {
+        "label": "NASDAQ 100 / US Tech 100",
+        "yahoo": "^NDX",
+        "plus500": "US Tech 100"
+    },
+    "SPX500": {
+        "label": "S&P 500 / US 500",
+        "yahoo": "^GSPC",
+        "plus500": "US 500"
+    },
+    "UK100": {
+        "label": "FTSE 100 / UK 100",
+        "yahoo": "^FTSE",
+        "plus500": "UK 100"
+    },
+    "GER40": {
+        "label": "Germany 40",
+        "yahoo": "^GDAXI",
+        "plus500": "Germany 40"
+    },
+    "GOLD": {
+        "label": "Gold (XAU/USD)",
+        "yahoo": "XAUUSD=X",
+        "plus500": "Gold"
+    },
+    "EURUSD": {
+        "label": "EUR/USD",
+        "yahoo": "EURUSD=X",
+        "plus500": "EUR/USD"
+    },
+    "GBPUSD": {
+        "label": "GBP/USD",
+        "yahoo": "GBPUSD=X",
+        "plus500": "GBP/USD"
+    }
+}
+
+# --------------------------
+# Routes
+# --------------------------
 
 @app.route("/")
 def index():
@@ -93,5 +146,84 @@ def backtest():
 
     return render_template("backtest.html")
 
+# --------------------------
+# Trend Signals route
+# --------------------------
+
+@app.route("/signals", methods=["GET", "POST"])
+def signals():
+    result = None
+    error = None
+
+    if request.method == "POST":
+        market_key = request.form.get("market")
+        if market_key not in MARKETS:
+            error = "Unknown market selection."
+        else:
+            info = MARKETS[market_key]
+            yahoo_symbol = info["yahoo"]
+
+            try:
+                # Get recent daily data
+                df = yf.download(yahoo_symbol, period="6mo", interval="1d", progress=False)
+            except Exception as e:
+                df = None
+                error = f"Data download failed: {e}"
+
+            if df is None or df.empty:
+                error = error or "No data returned for this market."
+            else:
+                # Trend-following: 20 / 50 SMA
+                short = 20
+                long = 50
+                df["SMA_short"] = df["Close"].rolling(short).mean()
+                df["SMA_long"] = df["Close"].rolling(long).mean()
+                df = df.dropna()
+
+                if len(df) < 2:
+                    error = "Not enough data for trend calculation."
+                else:
+                    last = df.iloc[-1]
+                    prev = df.iloc[-2]
+
+                    short_now = last["SMA_short"]
+                    long_now = last["SMA_long"]
+                    short_prev = prev["SMA_short"]
+                    long_prev = prev["SMA_long"]
+                    price_now = float(last["Close"])
+
+                    trend = "none"
+                    signal = "none"
+                    message = "No clear trend."
+
+                    if short_now > long_now:
+                        trend = "up"
+                        message = "Uptrend in place (BUY bias)."
+                        if short_prev <= long_prev:
+                            signal = "buy"
+                            message = "NEW BUY trend signal (short MA crossed above long MA)."
+                    elif short_now < long_now:
+                        trend = "down"
+                        message = "Downtrend in place (SELL / avoid longs)."
+                        if short_prev >= long_prev:
+                            signal = "sell"
+                            message = "NEW SELL trend signal (short MA crossed below long MA)."
+
+                    result = {
+                        "market_key": market_key,
+                        "label": info["label"],
+                        "plus500_name": info["plus500"],
+                        "yahoo_symbol": yahoo_symbol,
+                        "price": round(price_now, 4),
+                        "short_ma": round(short_now, 4),
+                        "long_ma": round(long_now, 4),
+                        "trend": trend,
+                        "signal": signal,
+                        "message": message
+                    }
+
+    return render_template("signals.html", markets=MARKETS, result=result, error=error)
+
 if __name__ == "__main__":
     app.run()
+
