@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Run Backtest</h2>
+
+<form method="POST">
+    <label>Ticker</label>
+    <input name="ticker" placeholder="AAPL">
+
+    <label>Short SMA</label>
+    <input name="short" type="number" value="20">
+
+    <label>Long SMA</label>
+    <input name="long" type="number" value="50">
+
+    <label>Start Date</label>
+    <input name="start" type="date">
+
+    <label>End Date</label>
+    <input name="end" type="date">
+
+    <button class="btn blue">Run</button>
+</form>
+
+{% endblock %}
