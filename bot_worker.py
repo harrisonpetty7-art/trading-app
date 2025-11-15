@@ -6,13 +6,23 @@ from datetime import datetime
 WATCHLIST = {
     "NAS100": "^NDX",
     "SPX500": "^GSPC",
-    "GER40": "^GDAXI",
     "UK100": "^FTSE",
-    "GOLD": "GC=F",        # <— fixed
+    "GER40": "^GDAXI",
+    "GOLD": "GC=F",
     "OIL": "CL=F",
     "EURUSD": "EURUSD=X",
-    "GBPUSD": "GBPUSD=X"
+    "GBPUSD": "GBPUSD=X",
+    "USDJPY": "JPY=X",
+    "AAPL": "AAPL",
+    "TSLA": "TSLA",
+    "MSFT": "MSFT",
+    "AMZN": "AMZN",
+    "META": "META",
+    "NVDA": "NVDA",
+    "GOOGL": "GOOGL",
+    "NFLX": "NFLX"
 }
+
 
 
 def check_market(symbol, yahoo):
