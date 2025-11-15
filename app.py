@@ -6,6 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import uuid
 import os
+import json          # <— add this line
 from datetime import datetime
 
 app = Flask(__name__)
@@ -220,9 +221,42 @@ def signals():
                         "message": message
                     }
 
-    return render_template("signals.html", markets=MARKETS, result=result, error=error)
+return render_template("signals.html", markets=MARKETS, result=result, error=error)
+
+
+@app.route("/live-signals")
+def live_signals():
+    error = None
+    raw_signals = []
+
+    # Try to read the file written by bot_worker.py
+    try:
+        with open("signals.json", "r") as f:
+            raw_signals = json.load(f)
+    except FileNotFoundError:
+        error = "No signals yet. The bot may still be running its first scan."
+    except Exception as e:
+        error = f"Could not read signals: {e}"
+
+    # Enrich signals with labels and Plus500 names if we have them
+    enriched = []
+    for row in raw_signals:
+        key = row.get("symbol")
+        info = MARKETS.get(key, {})
+        enriched.append({
+            "symbol": key,
+            "label": info.get("label", key),
+            "plus500_name": info.get("plus500", key),
+            "signal": row.get("signal"),
+            "price": row.get("price"),
+            "time": row.get("time"),
+        })
+
+    return render_template("live_signals.html", signals=enriched, error=error)
+
 
 if __name__ == "__main__":
     app.run()
+
 
 
