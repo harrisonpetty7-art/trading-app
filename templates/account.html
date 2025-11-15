@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Account</h2>
+
+<div class="card">
+    <h3>Balance</h3>
+    <p class="big">£{{ account.balance | round(2) }}</p>
+</div>
+
+<h3>Deposit</h3>
+<form method="POST">
+    <input type="hidden" name="type" value="deposit">
+    <input type="number" name="amount" placeholder="Enter amount">
+    <button class="btn green">Deposit</button>
+</form>
+
+<h3>Withdraw</h3>
+<form method="POST">
+    <input type="hidden" name="type" value="withdraw">
+    <input type="number" name="amount" placeholder="Enter amount">
+    <button class="btn red">Withdraw</button>
+</form>
+
+<h3>History</h3>
+{% for h in account.history %}
+<div class="history">
+    <strong>{{ h.action }}</strong> £{{ h.amount }} <br>
+    <small>{{ h.timestamp }}</small>
+</div>
+{% endfor %}
+
+{% endblock %}
