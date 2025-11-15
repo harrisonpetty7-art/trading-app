@@ -208,20 +208,24 @@ def signals():
                             signal = "sell"
                             message = "NEW SELL trend signal (short MA crossed below long MA)."
 
-                    result = {
-                        "market_key": market_key,
-                        "label": info["label"],
-                        "plus500_name": info["plus500"],
-                        "yahoo_symbol": yahoo_symbol,
-                        "price": round(price_now, 4),
-                        "short_ma": round(short_now, 4),
-                        "long_ma": round(long_now, 4),
-                        "trend": trend,
-                        "signal": signal,
-                        "message": message
-                    }
+                            result = {
+            "market_key": market_key,
+            "label": info["label"],
+            "plus500_name": info["plus500"],
+            "yahoo_symbol": yahoo_symbol,
+            "price": round(price_now, 4),
+            "short_ma": round(short_now, 4),
+            "long_ma": round(long_now, 4),
+            "trend": trend,
+            "signal": signal,
+            "message": message
+        }
 
-return render_template("signals.html", markets=MARKETS, result=result, error=error)
+        return render_template("signals.html",
+                               markets=MARKETS,
+                               result=result,
+                               error=error)
+
 
 
 @app.route("/live-signals")
@@ -257,6 +261,7 @@ def live_signals():
 
 if __name__ == "__main__":
     app.run()
+
 
 
 
