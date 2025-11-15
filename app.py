@@ -1,3 +1,255 @@
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import pandas as pd
+import yfinance as yf
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import os
+import json
+from datetime import datetime
+
+app = Flask(__name__)
+
+# -------------------------------------------------
+# MARKETS CONFIG (LABEL, PLUS500 NAME, YAHOO SYMBOL)
+# -------------------------------------------------
+MARKETS = {
+    "NAS100": {
+        "label": "NASDAQ 100 / US Tech 100",
+        "plus500": "US Tech 100",
+        "yahoo": "^NDX",
+    },
+    "SPX500": {
+        "label": "S&P 500 / US 500",
+        "plus500": "US 500",
+        "yahoo": "^GSPC",
+    },
+    "UK100": {
+        "label": "FTSE 100 / UK 100",
+        "plus500": "UK 100",
+        "yahoo": "^FTSE",
+    },
+    "GER40": {
+        "label": "Germany 40",
+        "plus500": "Germany 40",
+        "yahoo": "^GDAXI",
+    },
+    # Commodities
+    "GOLD": {
+        "label": "Gold",
+        "plus500": "Gold",
+        "yahoo": "GC=F",
+    },
+    "SILVER": {
+        "label": "Silver",
+        "plus500": "Silver",
+        "yahoo": "SI=F",
+    },
+    "COPPER": {
+        "label": "Copper",
+        "plus500": "Copper",
+        "yahoo": "HG=F",
+    },
+    "NATGAS": {
+        "label": "Natural Gas",
+        "plus500": "Natural Gas",
+        "yahoo": "NG=F",
+    },
+    "PLATINUM": {
+        "label": "Platinum",
+        "plus500": "Platinum",
+        "yahoo": "PL=F",
+    },
+    "PALLADIUM": {
+        "label": "Palladium",
+        "plus500": "Palladium",
+        "yahoo": "PA=F",
+    },
+    "OILW": {
+        "label": "US Crude Oil",
+        "plus500": "Oil",
+        "yahoo": "CL=F",
+    },
+    "OILB": {
+        "label": "Brent Oil",
+        "plus500": "Brent Oil",
+        "yahoo": "BZ=F",
+    },
+    # Forex
+    "EURUSD": {
+        "label": "EUR/USD",
+        "plus500": "EUR/USD",
+        "yahoo": "EURUSD=X",
+    },
+    "GBPUSD": {
+        "label": "GBP/USD",
+        "plus500": "GBP/USD",
+        "yahoo": "GBPUSD=X",
+    },
+    "USDJPY": {
+        "label": "USD/JPY",
+        "plus500": "USD/JPY",
+        "yahoo": "JPY=X",
+    },
+    # Stocks
+    "AAPL": {
+        "label": "Apple",
+        "plus500": "Apple",
+        "yahoo": "AAPL",
+    },
+    "TSLA": {
+        "label": "Tesla",
+        "plus500": "Tesla",
+        "yahoo": "TSLA",
+    },
+    "MSFT": {
+        "label": "Microsoft",
+        "plus500": "Microsoft",
+        "yahoo": "MSFT",
+    },
+    "AMZN": {
+        "label": "Amazon",
+        "plus500": "Amazon",
+        "yahoo": "AMZN",
+    },
+    "META": {
+        "label": "Meta",
+        "plus500": "Meta",
+        "yahoo": "META",
+    },
+    "NVDA": {
+        "label": "Nvidia",
+        "plus500": "Nvidia",
+        "yahoo": "NVDA",
+    },
+    "GOOGL": {
+        "label": "Alphabet (Google)",
+        "plus500": "Alphabet",
+        "yahoo": "GOOGL",
+    },
+    "NFLX": {
+        "label": "Netflix",
+        "plus500": "Netflix",
+        "yahoo": "NFLX",
+    },
+    # Crypto
+    "BTCUSD": {
+        "label": "Bitcoin / USD",
+        "plus500": "Bitcoin",
+        "yahoo": "BTC-USD",
+    },
+    "ETHUSD": {
+        "label": "Ethereum / USD",
+        "plus500": "Ethereum",
+        "yahoo": "ETH-USD",
+    },
+}
+
+
+# ------------------------
+# BASIC PAGES / NAVIGATION
+# ------------------------
+
+@app.route("/")
+def index():
+    # Home screen – show markets list if you want it
+    return render_template("index.html", markets=MARKETS)
+
+
+@app.route("/account")
+def account():
+    return render_template("account.html")
+
+
+@app.route("/backtest", methods=["GET", "POST"])
+def backtest():
+    """
+    Simple backtest: download data for one symbol, compute an equity curve,
+    and pass it to the template. This is deliberately simple so it doesn't break.
+    """
+    error = None
+    results = None
+    chart_url = None
+
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        if not symbol:
+            error = "Please choose a market."
+            return render_template(
+                "backtest.html",
+                error=error,
+                results=results,
+                chart_url=chart_url,
+                markets=MARKETS,
+            )
+
+        market = MARKETS.get(symbol, {})
+        yahoo = market.get("yahoo", symbol)
+
+        try:
+            df = yf.download(yahoo, period="1y", interval="1d", progress=False)
+        except Exception as e:
+            error = f"Error downloading data for {yahoo}: {e}"
+            return render_template(
+                "backtest.html",
+                error=error,
+                results=results,
+                chart_url=chart_url,
+                markets=MARKETS,
+            )
+
+        if df is None or df.empty:
+            error = "No data for that symbol."
+            return render_template(
+                "backtest.html",
+                error=error,
+                results=results,
+                chart_url=chart_url,
+                markets=MARKETS,
+            )
+
+        df["Return"] = df["Close"].pct_change()
+        df["Equity"] = (1 + df["Return"]).cumprod()
+
+        total_return = float(df["Equity"].iloc[-1] - 1) * 100.0
+        results = {
+            "symbol": symbol,
+            "label": market.get("label", symbol),
+            "total_return": round(total_return, 2),
+        }
+
+        # Make a simple equity curve chart
+        fig, ax = plt.subplots()
+        df["Equity"].plot(ax=ax)
+        ax.set_title(f"Equity curve for {symbol}")
+        ax.set_ylabel("Equity (start = 1.0)")
+        fig.tight_layout()
+
+        # Save chart into static folder
+        img_path = os.path.join("static", "backtest_equity.png")
+        fig.savefig(img_path)
+        plt.close(fig)
+        chart_url = "/static/backtest_equity.png"
+
+    return render_template(
+        "backtest.html",
+        error=error,
+        results=results,
+        chart_url=chart_url,
+        markets=MARKETS,
+    )
+
+
+@app.route("/results")
+def results():
+    # If your results.html expects more, we can add later.
+    return render_template("results.html")
+
+
+# -------------------------
+# LIVE SIGNALS + MANUAL SCAN
+# -------------------------
+
 @app.route("/live-signals")
 def live_signals():
     error = None
@@ -33,6 +285,7 @@ def run_manual_scan():
     """
     Run a one-off scan of all MARKETS and write signals.json.
     This is used by the 'Run new scan now' button.
+    Logic is similar to the background worker.
     """
     results = []
 
@@ -124,8 +377,14 @@ def api_live_signals():
     return jsonify({"signals": raw_signals, "error": None}), 200
 
 
+# -------------
+# ENTRY POINT
+# -------------
 if __name__ == "__main__":
-    app.run()
+    # For local testing; on Render, gunicorn runs this.
+    app.run(host="0.0.0.0", port=5000, debug=False)
+
+
 
 
 
