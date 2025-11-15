@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Results for {{ ticker }}</h2>
+
+<img src="/{{ img }}" class="chart">
+
+<a href="/backtest" class="btn blue">Run Another Backtest</a>
+
+{% endblock %}
