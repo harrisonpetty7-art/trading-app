@@ -103,16 +103,50 @@ MARKETS = {
         "yahoo": "^GDAXI",
         "plus500": "Germany 40"
     },
+
+    # ----- COMMODITIES -----
     "GOLD": {
-        "label": "Gold (futures)",
+        "label": "Gold (Spot)",
         "yahoo": "GC=F",
         "plus500": "Gold"
     },
-    "OIL": {
-        "label": "Crude Oil (WTI)",
+    "SILVER": {
+        "label": "Silver (Spot)",
+        "yahoo": "SI=F",
+        "plus500": "Silver"
+    },
+    "COPPER": {
+        "label": "Copper (Futures)",
+        "yahoo": "HG=F",
+        "plus500": "Copper"
+    },
+    "NATGAS": {
+        "label": "Natural Gas",
+        "yahoo": "NG=F",
+        "plus500": "Natural Gas"
+    },
+    "PLATINUM": {
+        "label": "Platinum",
+        "yahoo": "PL=F",
+        "plus500": "Platinum"
+    },
+    "PALLADIUM": {
+        "label": "Palladium",
+        "yahoo": "PA=F",
+        "plus500": "Palladium"
+    },
+    "OILW": {
+        "label": "Crude Oil WTI",
         "yahoo": "CL=F",
         "plus500": "Oil"
     },
+    "OILB": {
+        "label": "Brent Oil",
+        "yahoo": "BZ=F",
+        "plus500": "Brent Oil"
+    },
+
+    # ----- FOREX -----
     "EURUSD": {
         "label": "EUR/USD",
         "yahoo": "EURUSD=X",
@@ -128,45 +162,27 @@ MARKETS = {
         "yahoo": "JPY=X",
         "plus500": "USD/JPY"
     },
-    "AAPL": {
-        "label": "Apple",
-        "yahoo": "AAPL",
-        "plus500": "Apple"
+
+    # ----- STOCKS -----
+    "AAPL": { "label": "Apple", "yahoo": "AAPL", "plus500": "Apple" },
+    "TSLA": { "label": "Tesla", "yahoo": "TSLA", "plus500": "Tesla" },
+    "MSFT": { "label": "Microsoft", "yahoo": "MSFT", "plus500": "Microsoft" },
+    "AMZN": { "label": "Amazon", "yahoo": "AMZN", "plus500": "Amazon" },
+    "META": { "label": "Meta", "yahoo": "META", "plus500": "Meta" },
+    "NVDA": { "label": "NVIDIA", "yahoo": "NVDA", "plus500": "NVIDIA" },
+    "GOOGL": { "label": "Google", "yahoo": "GOOGL", "plus500": "Alphabet" },
+    "NFLX": { "label": "Netflix", "yahoo": "NFLX", "plus500": "Netflix" },
+
+    # ----- CRYPTO -----
+    "BTCUSD": {
+        "label": "Bitcoin",
+        "yahoo": "BTC-USD",
+        "plus500": "Bitcoin"
     },
-    "TSLA": {
-        "label": "Tesla",
-        "yahoo": "TSLA",
-        "plus500": "Tesla"
-    },
-    "MSFT": {
-        "label": "Microsoft",
-        "yahoo": "MSFT",
-        "plus500": "Microsoft"
-    },
-    "AMZN": {
-        "label": "Amazon",
-        "yahoo": "AMZN",
-        "plus500": "Amazon"
-    },
-    "META": {
-        "label": "Meta Platforms (Facebook)",
-        "yahoo": "META",
-        "plus500": "Meta"
-    },
-    "NVDA": {
-        "label": "NVIDIA",
-        "yahoo": "NVDA",
-        "plus500": "NVIDIA"
-    },
-    "GOOGL": {
-        "label": "Alphabet (Google)",
-        "yahoo": "GOOGL",
-        "plus500": "Alphabet"
-    },
-    "NFLX": {
-        "label": "Netflix",
-        "yahoo": "NFLX",
-        "plus500": "Netflix"
+    "ETHUSD": {
+        "label": "Ethereum",
+        "yahoo": "ETH-USD",
+        "plus500": "Ethereum"
     }
 }
 
@@ -361,6 +377,7 @@ def refresh_live_signals():
 
 if __name__ == "__main__":
     app.run()
+
 
 
 
