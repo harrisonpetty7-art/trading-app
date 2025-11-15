@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📊 Trend Signals (Plus500-friendly)</h2>
+<p>Select a market the bot should analyse. It will show the current trend and a suggested action you can take on Plus500.</p>
+
+<form method="POST" style="margin-top: 15px; margin-bottom: 20px;">
+  <label for="market">Market</label>
+  <select name="market" id="market" style="width: 100%; padding: 10px; margin: 8px 0;">
+    {% for key, info in markets.items() %}
+      <option value="{{ key }}">{{ key }} – {{ info.label }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn blue" type="submit">Scan trend</button>
+</form>
+
+{% if error %}
+  <div class="card" style="background:#ffe6e6;">
+    <strong>Error:</strong> {{ error }}
+  </div>
+{% endif %}
+
+{% if result %}
+  <div class="card">
+    <h3>Result for {{ result.market_key }} ({{ result.label }})</h3>
+    <p><strong>Trade on Plus500 as:</strong> {{ result.plus500_name }}</p>
+    <p><strong>Data source:</strong> {{ result.yahoo_symbol }}</p>
+    <p><strong>Last price:</strong> {{ result.price }}</p>
+    <p><strong>Short MA (20):</strong> {{ result.short_ma }}</p>
+    <p><strong>Long MA (50):</strong> {{ result.long_ma }}</p>
+
+    <hr>
+
+    <p><strong>Bot view:</strong> {{ result.message }}</p>
+
+    {% if result.signal == "buy" %}
+      <p><strong>Suggested bias:</strong> Look for BUY setups on <em>{{ result.plus500_name }}</em> in Plus500.</p>
+    {% elif result.signal == "sell" %}
+      <p><strong>Suggested bias:</strong> Look for SELL/short or avoid longs on <em>{{ result.plus500_name }}</em> in Plus500.</p>
+    {% elif result.trend == "up" %}
+      <p><strong>Suggested bias:</strong> Uptrend in place – favour BUY/long on <em>{{ result.plus500_name }}</em>.</p>
+    {% elif result.trend == "down" %}
+      <p><strong>Suggested bias:</strong> Downtrend in place – favour SELL/avoid longs on <em>{{ result.plus500_name }}</em>.</p>
+    {% else %}
+      <p><strong>Suggested bias:</strong> No strong trend – you may want to wait.</p>
+    {% endif %}
+  </div>
+
+  <p style="margin-top: 10px; font-size: 13px; color:#666;">
+    Remember: This is a signal helper. You still decide if and how to place trades on Plus500.
+  </p>
+{% endif %}
+
+{% endblock %}
