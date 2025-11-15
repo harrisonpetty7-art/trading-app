@@ -183,14 +183,12 @@ def signals():
                 if len(df) < 2:
                     error = "Not enough data for trend calculation."
                 else:
-                    last = df.iloc[-1]
-                    prev = df.iloc[-2]
-
-                    short_now = last["SMA_short"]
-                    long_now = last["SMA_long"]
-                    short_prev = prev["SMA_short"]
-                    long_prev = prev["SMA_long"]
-                    price_now = float(last["Close"])
+                    # Take the last two values explicitly as floats
+                    short_now = float(df["SMA_short"].iloc[-1])
+                    long_now = float(df["SMA_long"].iloc[-1])
+                    short_prev = float(df["SMA_short"].iloc[-2])
+                    long_prev = float(df["SMA_long"].iloc[-2])
+                    price_now = float(df["Close"].iloc[-1])
 
                     trend = "none"
                     signal = "none"
@@ -226,4 +224,5 @@ def signals():
 
 if __name__ == "__main__":
     app.run()
+
 
