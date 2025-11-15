@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import pandas as pd
 import yfinance as yf
 import matplotlib
@@ -365,18 +365,23 @@ def live_signals():
 
     return render_template("live_signals.html", signals=enriched, error=error)
 
-@app.route("/refresh-live-signals")
-def refresh_live_signals():
+@app.route("/api/live-signals")
+def api_live_signals():
+    """Return raw signals.json as JSON for the frontend to poll."""
     try:
-        run_bot_scan_once()
+        with open("signals.json", "r") as f:
+            raw_signals = json.load(f)
+    except FileNotFoundError:
+        return jsonify({"signals": [], "error": "No signals yet"}), 200
     except Exception as e:
-        print(f"Manual refresh error: {e}")
-    # After scanning, go back to the live signals page
-    return redirect(url_for("live_signals"))
+        return jsonify({"signals": [], "error": str(e)}), 500
+
+    return jsonify({"signals": raw_signals, "error": None}), 200
 
 
 if __name__ == "__main__":
     app.run()
+
 
 
 
