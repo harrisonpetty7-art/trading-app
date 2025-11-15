@@ -2,4 +2,18 @@
 {% block content %}
 <h1>📱 Trading App</h1>
 <p>Welcome to your trading app! Use the menu to manage your account or run backtests.</p>
+
+<hr>
+
+<h3>Notifications</h3>
+<p>Use these buttons to enable alerts and test them.</p>
+
+<button class="btn blue" onclick="requestNotificationPermission()">
+  Enable notifications
+</button>
+
+<button class="btn green" style="margin-top: 10px;" onclick="sendTestNotification()">
+  Send test alert
+</button>
+
 {% endblock %}
