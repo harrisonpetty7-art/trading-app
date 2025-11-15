@@ -158,46 +158,38 @@ def signals():
 
     if request.method == "POST":
         market_key = request.form.get("market")
-        if market_key not in MARKETS:
-            error = "Unknown market selection."
+        info = MARKETS.get(market_key)
+
+        if not info:
+            error = "Unknown market."
         else:
-            info = MARKETS[market_key]
-            yahoo_symbol = info["yahoo"]
-
             try:
-                # Get recent daily data
+                yahoo_symbol = info["yahoo"]
+
                 df = yf.download(yahoo_symbol, period="6mo", interval="1d", progress=False)
-            except Exception as e:
-                df = None
-                error = f"Data download failed: {e}"
 
-            if df is None or df.empty:
-                error = error or "No data returned for this market."
-            else:
-                # Trend-following: 20 / 50 SMA
-                short = 20
-                long = 50
-                df["SMA_short"] = df["Close"].rolling(short).mean()
-                df["SMA_long"] = df["Close"].rolling(long).mean()
-                df = df.dropna()
-
-                if len(df) < 2:
+                if df.empty or len(df) < 60:
                     error = "Not enough data for trend calculation."
                 else:
-                    # Take the last two values explicitly as floats
+                    # Moving averages
+                    df["SMA_short"] = df["Close"].rolling(20).mean()
+                    df["SMA_long"] = df["Close"].rolling(50).mean()
+                    df = df.dropna()
+
                     short_now = float(df["SMA_short"].iloc[-1])
                     long_now = float(df["SMA_long"].iloc[-1])
                     short_prev = float(df["SMA_short"].iloc[-2])
                     long_prev = float(df["SMA_long"].iloc[-2])
                     price_now = float(df["Close"].iloc[-1])
 
-                    trend = "none"
+                    # Defaults
+                    trend = "flat"
                     signal = "none"
                     message = "No clear trend."
 
                     if short_now > long_now:
                         trend = "up"
-                        message = "Uptrend in place (BUY bias)."
+                        message = "Uptrend in place (BUY dips / avoid shorts)."
                         if short_prev <= long_prev:
                             signal = "buy"
                             message = "NEW BUY trend signal (short MA crossed above long MA)."
@@ -208,23 +200,24 @@ def signals():
                             signal = "sell"
                             message = "NEW SELL trend signal (short MA crossed below long MA)."
 
-                            result = {
-            "market_key": market_key,
-            "label": info["label"],
-            "plus500_name": info["plus500"],
-            "yahoo_symbol": yahoo_symbol,
-            "price": round(price_now, 4),
-            "short_ma": round(short_now, 4),
-            "long_ma": round(long_now, 4),
-            "trend": trend,
-            "signal": signal,
-            "message": message
-        }
+                    result = {
+                        "market_key": market_key,
+                        "label": info["label"],
+                        "plus500_name": info["plus500"],
+                        "yahoo_symbol": yahoo_symbol,
+                        "price": round(price_now, 4),
+                        "short_ma": round(short_now, 4),
+                        "long_ma": round(long_now, 4),
+                        "trend": trend,
+                        "signal": signal,
+                        "message": message,
+                    }
 
-        return render_template("signals.html",
-                               markets=MARKETS,
-                               result=result,
-                               error=error)
+            except Exception as e:
+                error = f"Error fetching data: {e}"
+
+    # <-- ALWAYS executed, whether GET or POST, error or ok
+    return render_template("signals.html", markets=MARKETS, result=result, error=error)
 
 
 
@@ -261,6 +254,7 @@ def live_signals():
 
 if __name__ == "__main__":
     app.run()
+
 
 
 
