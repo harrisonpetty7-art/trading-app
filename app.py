@@ -104,9 +104,14 @@ MARKETS = {
         "plus500": "Germany 40"
     },
     "GOLD": {
-        "label": "Gold (XAU/USD)",
-        "yahoo": "XAUUSD=X",
+        "label": "Gold (futures)",
+        "yahoo": "GC=F",
         "plus500": "Gold"
+    },
+    "OIL": {
+        "label": "Crude Oil (WTI)",
+        "yahoo": "CL=F",
+        "plus500": "Oil"
     },
     "EURUSD": {
         "label": "EUR/USD",
@@ -117,8 +122,54 @@ MARKETS = {
         "label": "GBP/USD",
         "yahoo": "GBPUSD=X",
         "plus500": "GBP/USD"
+    },
+    "USDJPY": {
+        "label": "USD/JPY",
+        "yahoo": "JPY=X",
+        "plus500": "USD/JPY"
+    },
+    "AAPL": {
+        "label": "Apple",
+        "yahoo": "AAPL",
+        "plus500": "Apple"
+    },
+    "TSLA": {
+        "label": "Tesla",
+        "yahoo": "TSLA",
+        "plus500": "Tesla"
+    },
+    "MSFT": {
+        "label": "Microsoft",
+        "yahoo": "MSFT",
+        "plus500": "Microsoft"
+    },
+    "AMZN": {
+        "label": "Amazon",
+        "yahoo": "AMZN",
+        "plus500": "Amazon"
+    },
+    "META": {
+        "label": "Meta Platforms (Facebook)",
+        "yahoo": "META",
+        "plus500": "Meta"
+    },
+    "NVDA": {
+        "label": "NVIDIA",
+        "yahoo": "NVDA",
+        "plus500": "NVIDIA"
+    },
+    "GOOGL": {
+        "label": "Alphabet (Google)",
+        "yahoo": "GOOGL",
+        "plus500": "Alphabet"
+    },
+    "NFLX": {
+        "label": "Netflix",
+        "yahoo": "NFLX",
+        "plus500": "Netflix"
     }
 }
+
 
 # --------------------------
 # Routes
@@ -310,6 +361,7 @@ def refresh_live_signals():
 
 if __name__ == "__main__":
     app.run()
+
 
 
 
