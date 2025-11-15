@@ -8,11 +8,12 @@ WATCHLIST = {
     "SPX500": "^GSPC",
     "GER40": "^GDAXI",
     "UK100": "^FTSE",
-    "GOLD": "XAUUSD=X",
+    "GOLD": "GC=F",          # <— changed here
     "OIL": "CL=F",
     "EURUSD": "EURUSD=X",
     "GBPUSD": "GBPUSD=X"
 }
+
 
 def check_market(symbol, yahoo):
     df = yf.download(yahoo, period="3mo", interval="1h", progress=False)
