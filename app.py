@@ -7,6 +7,27 @@ import matplotlib.pyplot as plt
 import os
 import json
 from datetime import datetime
+import requests
+
+# --- TELEGRAM NOTIFICATION (same as in bot_worker) ---
+
+def send_telegram(msg):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+    if not token or not chat_id:
+        print("Telegram not configured in environment variables.")
+        return
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    data = {"chat_id": chat_id, "text": msg}
+
+    try:
+        requests.post(url, data=data)
+        print("Telegram test message sent from app.py!")
+    except Exception as e:
+        print("Failed to send Telegram from app.py:", e)
+
 
 app = Flask(__name__)
 
@@ -250,6 +271,13 @@ def live_signals():
 
     return render_template("live_signals.html", signals=enriched, error=error)
 
+@app.route("/test-alert", methods=["POST"])
+def test_alert():
+    # Send a simple test message
+    send_telegram("Test alert from your trading bot app ✅")
+    # Go back to the live signals page
+    return redirect(url_for("live_signals"))
+
 
 def run_manual_scan():
     """
@@ -355,6 +383,7 @@ def api_live_signals():
 if __name__ == "__main__":
     # For local testing; on Render, gunicorn runs this.
     app.run(host="0.0.0.0", port=5000, debug=False)
+
 
 
 
