@@ -14,27 +14,29 @@ app = Flask(__name__)
 # MARKETS CONFIG (LABEL, PLUS500 NAME, YAHOO SYMBOL)
 # -------------------------------------------------
 MARKETS = {
-    "NAS100": {
+    # ----- INDICES -----
+    "US100": {
         "label": "NASDAQ 100 / US Tech 100",
         "plus500": "US Tech 100",
         "yahoo": "^NDX",
     },
-    "SPX500": {
+    "US500": {
         "label": "S&P 500 / US 500",
         "plus500": "US 500",
         "yahoo": "^GSPC",
-    },
-    "UK100": {
-        "label": "FTSE 100 / UK 100",
-        "plus500": "UK 100",
-        "yahoo": "^FTSE",
     },
     "GER40": {
         "label": "Germany 40",
         "plus500": "Germany 40",
         "yahoo": "^GDAXI",
     },
-    # Commodities
+    "UK100": {
+        "label": "FTSE 100 / UK 100",
+        "plus500": "UK 100",
+        "yahoo": "^FTSE",
+    },
+
+    # ----- COMMODITIES -----
     "GOLD": {
         "label": "Gold",
         "plus500": "Gold",
@@ -45,27 +47,7 @@ MARKETS = {
         "plus500": "Silver",
         "yahoo": "SI=F",
     },
-    "COPPER": {
-        "label": "Copper",
-        "plus500": "Copper",
-        "yahoo": "HG=F",
-    },
-    "NATGAS": {
-        "label": "Natural Gas",
-        "plus500": "Natural Gas",
-        "yahoo": "NG=F",
-    },
-    "PLATINUM": {
-        "label": "Platinum",
-        "plus500": "Platinum",
-        "yahoo": "PL=F",
-    },
-    "PALLADIUM": {
-        "label": "Palladium",
-        "plus500": "Palladium",
-        "yahoo": "PA=F",
-    },
-    "OILW": {
+    "OIL": {
         "label": "US Crude Oil",
         "plus500": "Oil",
         "yahoo": "CL=F",
@@ -75,7 +57,13 @@ MARKETS = {
         "plus500": "Brent Oil",
         "yahoo": "BZ=F",
     },
-    # Forex
+    "NATGAS": {
+        "label": "Natural Gas",
+        "plus500": "Natural Gas",
+        "yahoo": "NG=F",
+    },
+
+    # ----- FOREX (OPTIONAL, EASY TO FIND ON PLUS500) -----
     "EURUSD": {
         "label": "EUR/USD",
         "plus500": "EUR/USD",
@@ -86,12 +74,20 @@ MARKETS = {
         "plus500": "GBP/USD",
         "yahoo": "GBPUSD=X",
     },
-    "USDJPY": {
-        "label": "USD/JPY",
-        "plus500": "USD/JPY",
-        "yahoo": "JPY=X",
+
+    # ----- CRYPTO -----
+    "BTCUSD": {
+        "label": "Bitcoin / USD",
+        "plus500": "Bitcoin",
+        "yahoo": "BTC-USD",
     },
-    # Stocks
+    "ETHUSD": {
+        "label": "Ethereum / USD",
+        "plus500": "Ethereum",
+        "yahoo": "ETH-USD",
+    },
+
+    # ----- US STOCKS -----
     "AAPL": {
         "label": "Apple",
         "plus500": "Apple",
@@ -112,39 +108,12 @@ MARKETS = {
         "plus500": "Amazon",
         "yahoo": "AMZN",
     },
-    "META": {
-        "label": "Meta",
-        "plus500": "Meta",
-        "yahoo": "META",
-    },
     "NVDA": {
-        "label": "Nvidia",
-        "plus500": "Nvidia",
+        "label": "NVIDIA",
+        "plus500": "NVIDIA",
         "yahoo": "NVDA",
     },
-    "GOOGL": {
-        "label": "Alphabet (Google)",
-        "plus500": "Alphabet",
-        "yahoo": "GOOGL",
-    },
-    "NFLX": {
-        "label": "Netflix",
-        "plus500": "Netflix",
-        "yahoo": "NFLX",
-    },
-    # Crypto
-    "BTCUSD": {
-        "label": "Bitcoin / USD",
-        "plus500": "Bitcoin",
-        "yahoo": "BTC-USD",
-    },
-    "ETHUSD": {
-        "label": "Ethereum / USD",
-        "plus500": "Ethereum",
-        "yahoo": "ETH-USD",
-    },
 }
-
 
 # ------------------------
 # BASIC PAGES / NAVIGATION
@@ -386,6 +355,7 @@ def api_live_signals():
 if __name__ == "__main__":
     # For local testing; on Render, gunicorn runs this.
     app.run(host="0.0.0.0", port=5000, debug=False)
+
 
 
 
