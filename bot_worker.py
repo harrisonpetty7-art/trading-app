@@ -1,7 +1,27 @@
-import time
 import yfinance as yf
 import json
-from datetime import datetime
+import time
+import os
+import requests   # <---- this must be added
+
+# ---- TELEGRAM NOTIFICATION FUNCTION ----
+def send_telegram(msg):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+    if not token or not chat_id:
+        print("Telegram not configured")
+        return
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    data = {"chat_id": chat_id, "text": msg}
+
+    try:
+        requests.post(url, data=data)
+        print("Telegram message sent!")
+    except Exception as e:
+        print("Failed to send Telegram:", e)
+
 
 WATCHLIST = {
     # Indices
