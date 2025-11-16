@@ -1,6 +1,7 @@
-Flask
-Werkzeug
+flask
+gunicorn
 yfinance
 pandas
 matplotlib
-gunicorn
+requests
+
