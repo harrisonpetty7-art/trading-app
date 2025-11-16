@@ -70,23 +70,48 @@ def check_market(symbol, yahoo):
     df = df.dropna()
 
     short_now = float(df["SMA20"].iloc[-1])
-    long_now = float(df["SMA50"].iloc[-1])
+    long_now  = float(df["SMA50"].iloc[-1])
     short_prev = float(df["SMA20"].iloc[-2])
-    long_prev = float(df["SMA50"].iloc[-2])
+    long_prev  = float(df["SMA50"].iloc[-2])
+    price_now  = float(df["Close"].iloc[-1])
 
     signal = "none"
+    trend = "none"
+    message = "No clear trend."
 
+    # --- Trend logic (same idea as before) ---
     if short_now > long_now:
-    trend = "up"
-    message = "Uptrend in place (BUY / avoid sells)."
+        trend = "up"
+        message = "Uptrend in place (BUY / avoid sells)."
 
-    # Check if we just crossed from below -> above (NEW BUY signal)
-    if short_prev <= long_prev:
-        signal = "buy"
-        message = "NEW BUY trend signal (short MA crossed above long MA)."
+        # NEW BUY crossover
+        if short_prev <= long_prev:
+            signal = "buy"
+            message = "NEW BUY trend signal (short MA crossed above long MA)."
 
-        # 👉 SEND TELEGRAM ALERT FOR BUY
-        send_telegram(f"BUY signal on {market_key}! Price: {round(price_now, 4)}")
+    elif short_now < long_now:
+        trend = "down"
+        message = "Downtrend in place (SELL / avoid longs)."
+
+        # NEW SELL crossover
+        if short_prev >= long_prev:
+            signal = "sell"
+            message = "NEW SELL trend signal (short MA crossed below long MA)."
+
+    # --- TELEGRAM ALERTS ---
+    # Send a Telegram whenever the bot has a BUY or SELL signal
+    if signal in ("buy", "sell"):
+        direction = "BUY" if signal == "buy" else "SELL"
+        send_telegram(f"{direction} signal on {symbol}! Price: {round(price_now, 4)}")
+
+    return {
+        "symbol": symbol,
+        "price": price_now,
+        "trend": trend,
+        "signal": signal,
+        "message": message,
+    }
+
 
 elif short_now < long_now:
     trend = "down"
