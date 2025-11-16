@@ -158,7 +158,8 @@ def index():
 
 @app.route("/account")
 def account():
-    return render_template("account.html")
+    # Simple placeholder for now so it never 500s
+    return "<h1>Account page</h1><p>We’ll wire this up properly later.</p>"
 
 
 @app.route("/backtest", methods=["GET", "POST"])
@@ -393,6 +394,7 @@ def api_live_signals():
 if __name__ == "__main__":
     # For local testing; on Render, gunicorn runs this.
     app.run(host="0.0.0.0", port=5000, debug=False)
+
 
 
 
