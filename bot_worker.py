@@ -25,15 +25,13 @@ WATCHLIST = {
     "BTCUSD": "BTC-USD",
     "ETHUSD": "ETH-USD",
 
-    # Stocks
+    # US Stocks
     "AAPL": "AAPL",
     "TSLA": "TSLA",
     "MSFT": "MSFT",
     "AMZN": "AMZN",
     "NVDA": "NVDA",
 }
-
-
 
 def check_market(symbol, yahoo):
     try:
