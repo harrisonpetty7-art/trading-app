@@ -366,14 +366,6 @@ def refresh_live_signals():
     run_manual_scan()
     return redirect(url_for("live_signals"))
 
-@app.route("/signals")
-def signals_alias():
-    # Old URL alias – redirect to the new live signals page
-    return redirect(url_for("live_signals"))
-
-
-
-
 @app.route("/api/live-signals")
 def api_live_signals():
     """Return raw signals.json as JSON for the frontend to poll."""
@@ -394,6 +386,7 @@ def api_live_signals():
 if __name__ == "__main__":
     # For local testing; on Render, gunicorn runs this.
     app.run(host="0.0.0.0", port=5000, debug=False)
+
 
 
 
