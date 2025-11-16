@@ -76,17 +76,35 @@ def check_market(symbol, yahoo):
 
     signal = "none"
 
-    if short_now > long_now and short_prev <= long_prev:
-        signal = "BUY"
-    elif short_now < long_now and short_prev >= long_prev:
-        signal = "SELL"
+    if short_now > long_now:
+    trend = "up"
+    message = "Uptrend in place (BUY / avoid sells)."
 
-    return {
-        "symbol": symbol,
-        "signal": signal,
-        "price": float(df["Close"].iloc[-1]),
-        "time": datetime.now().strftime("%Y-%m-%d %H:%M")
-    }
+    # Check if we just crossed from below -> above (NEW BUY signal)
+    if short_prev <= long_prev:
+        signal = "buy"
+        message = "NEW BUY trend signal (short MA crossed above long MA)."
+
+        # 👉 SEND TELEGRAM ALERT FOR BUY
+        send_telegram(f"BUY signal on {market_key}! Price: {round(price_now, 4)}")
+
+elif short_now < long_now:
+    trend = "down"
+    message = "Downtrend in place (SELL / avoid longs)."
+
+    # Check if we just crossed from above -> below (NEW SELL signal)
+    if short_prev >= long_prev:
+        signal = "sell"
+        message = "NEW SELL trend signal (short MA crossed below long MA)."
+
+        # 👉 SEND TELEGRAM ALERT FOR SELL
+        send_telegram(f"SELL signal on {market_key}! Price: {round(price_now, 4)}")
+
+else:
+    trend = "none"
+    signal = "none"
+    message = "No clear trend."
+
 
 
 def main_loop():
