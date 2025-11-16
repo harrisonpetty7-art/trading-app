@@ -4,39 +4,33 @@ import json
 from datetime import datetime
 
 WATCHLIST = {
-    "NAS100": "^NDX",
-    "SPX500": "^GSPC",
-    "UK100": "^FTSE",
+    # Indices
+    "US100": "^NDX",
+    "US500": "^GSPC",
     "GER40": "^GDAXI",
+    "UK100": "^FTSE",
 
     # Commodities
     "GOLD": "GC=F",
     "SILVER": "SI=F",
-    "COPPER": "HG=F",
-    "NATGAS": "NG=F",
-    "PLATINUM": "PL=F",
-    "PALLADIUM": "PA=F",
-    "OILW": "CL=F",
+    "OIL": "CL=F",
     "OILB": "BZ=F",
+    "NATGAS": "NG=F",
 
     # Forex
     "EURUSD": "EURUSD=X",
     "GBPUSD": "GBPUSD=X",
-    "USDJPY": "JPY=X",
+
+    # Crypto
+    "BTCUSD": "BTC-USD",
+    "ETHUSD": "ETH-USD",
 
     # Stocks
     "AAPL": "AAPL",
     "TSLA": "TSLA",
     "MSFT": "MSFT",
     "AMZN": "AMZN",
-    "META": "META",
     "NVDA": "NVDA",
-    "GOOGL": "GOOGL",
-    "NFLX": "NFLX",
-
-    # Crypto
-    "BTCUSD": "BTC-USD",
-    "ETHUSD": "ETH-USD"
 }
 
 
