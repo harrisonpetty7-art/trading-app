@@ -271,12 +271,14 @@ def live_signals():
 
     return render_template("live_signals.html", signals=enriched, error=error)
 
-@app.route("/test-alert", methods=["POST"])
+@app.route("/test-alert", methods=["GET", "POST"])
 def test_alert():
     # Send a simple test message
-    send_telegram("Test alert from your trading bot app ✅")
+    send_telegram("Test alert from your trading bot ✅")
+
     # Go back to the live signals page
     return redirect(url_for("live_signals"))
+
 
 
 def run_manual_scan():
@@ -383,6 +385,7 @@ def api_live_signals():
 if __name__ == "__main__":
     # For local testing; on Render, gunicorn runs this.
     app.run(host="0.0.0.0", port=5000, debug=False)
+
 
 
 
